@@ -29,10 +29,8 @@ buildNpmPackage {
   '';
 
   meta = with lib; {
-    description = "A packaged Angular static site";
-    homepage = "https://example.com";
-    license = licenses.mit;
-    maintainers = with maintainers; [];
+    description = "Angular front-end for the doodle application (resources)";
+    homepage = "https://github.com/selabs-ur1/doodle";
     platforms = platforms.all;
   };
 }

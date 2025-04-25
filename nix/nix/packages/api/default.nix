@@ -5,7 +5,6 @@
   maven,
   jdk11_headless,
 }:
-
 maven.buildMavenPackage rec {
   pname = "Doodle-Api";
   version = "1.2.1";
@@ -27,4 +26,10 @@ maven.buildMavenPackage rec {
 
     runHook postInstall
   '';
+
+  meta = with lib; {
+    description = "Quarkus backend-end for the doodle application (resources)";
+    homepage = "https://github.com/selabs-ur1/doodle";
+    platforms = platforms.all;
+  };
 }

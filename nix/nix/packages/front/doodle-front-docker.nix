@@ -1,6 +1,7 @@
 {
   pkgs,
   doodle-front-server,
+  lib,
 }:
 pkgs.dockerTools.buildLayeredImage {
   name = "Doodle-Front";
@@ -11,5 +12,11 @@ pkgs.dockerTools.buildLayeredImage {
   '';
   config = {
     Cmd = ["/server"];
+  };
+
+  meta = with lib; {
+    description = "Angular front-end for the doodle application (container)";
+    homepage = "https://github.com/selabs-ur1/doodle";
+    platforms = platforms.all;
   };
 }
