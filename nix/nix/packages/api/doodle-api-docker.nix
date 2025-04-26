@@ -12,6 +12,10 @@ pkgs.dockerTools.buildLayeredImage {
   '';
   config = {
     Cmd = ["/server"];
+    Env = [
+      "GIT_SSL_CAINFO=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt" # TODO Might not be needed
+      "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+    ];
   };
 
   meta = with lib; {

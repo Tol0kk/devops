@@ -6,7 +6,7 @@
   outputs = {
     self,
     nixpkgs,
-  }: let
+  } @ inputs: let
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
     forEachSupportedSystem = f:
       nixpkgs.lib.genAttrs supportedSystems (system:
@@ -15,6 +15,7 @@
             inherit system;
           };
         });
+    libs = import nix/libs {inherit (nixpkgs) lib;};
   in {
     packages = forEachSupportedSystem ({pkgs}: let
       doodle-api = pkgs.callPackage ./nix/packages/api/default.nix {};
@@ -41,18 +42,20 @@
         type = "app";
         program = "${self.packages.${pkgs.system}.doodle-front-server}/bin/doodle-front-server";
       };
+      vm-test = libs.mkAppVM "vm-front-x86_64-linux" self;
     });
+
+    nixosConfigurations = import nix/systems {inherit inputs nixpkgs libs;};
 
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
         buildInputs = with pkgs; [
+          # Frontend
           nodejs_23
           nodePackages."@angular/cli"
           nest-cli
           nodePackages.typescript
           nodePackages.typescript-language-server
-          sqlite
-          python3Minimal
 
           # Backend
           jdk11

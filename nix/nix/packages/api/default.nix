@@ -1,11 +1,9 @@
 {
   lib,
-  # jre,
-  # makeWrapper,
   maven,
   jdk11_headless,
 }:
-maven.buildMavenPackage rec {
+maven.buildMavenPackage {
   pname = "Doodle-Api";
   version = "1.2.1";
 
