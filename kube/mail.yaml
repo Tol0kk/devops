@@ -1,0 +1,47 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mail
+  namespace: doodle
+  labels:
+    k8s-app: mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: mail
+  template:
+    metadata:
+      name: mail
+      labels:
+        k8s-app: mail
+    spec:
+      containers:
+        - name: mail
+          image: bytemark/smtp:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: false
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mail
+  namespace: doodle
+  labels:
+    k8s-app: mail
+spec:
+  ports:
+    - name: tcp-2525-25-smtp
+      protocol: TCP
+      port: 2525
+      targetPort: 25
+  selector:
+    k8s-app: mail

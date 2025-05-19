@@ -1,18 +1,26 @@
 doodle:
   usepad: true
-  internalPadUrl: "http://localhost:9001/"
-  externalPadUrl: "http://localhost:9001/"
+  internalPadUrl: "http://etherpad:9001/"
+  externalPadUrl: "http://192.168.49.2:30081/etherpad/"
   padApiKey: "19d89ca52bc0fa4f19d6325464d9d7a032649b9fa68c111514627081e2784b4a"
-  organizermail: "olivier.barais@gmail.com"
+  organizermail: "olivier.barais@test.com"
   tmpfolder: "/tmp/excelFiles"
 quarkus:
+  log: 
+    level: DEBUG
   datasource:
     db-kind: mysql
     username: tlc
     password: tlc
     jdbc:
-      url: jdbc:mysql://localhost:3306/tlc?useUnicode=true&serverTimezone=Europe/Paris
+      url: jdbc:mysql://mysql:3306/tlc?useUnicode=true&serverTimezone=Europe/Paris&enabledTLSProtocols=TLSv1.2
       driver: com.mysql.cj.jdbc.Driver
+    # db-kind: mariadb
+    # username: tlc
+    # password: tlc
+    # jdbc:
+    #   url: jdbc:mariadb://mysql:3306/tlc?useUnicode=true&serverTimezone=Europe/Paris&enabledTLSProtocols=TLSv1.2&allowPublicKeyRetrieval=true
+    #   driver: org.mariadb.jdbc.Driver
   flyway:
     migrate-at-start: true
     baseline-on-migrate: true
@@ -22,7 +30,7 @@ quarkus:
   mailer:
     from: test@quarkus.io
 #    host: smtp.sendgrid.net
-    host: localhost
+    host: mail
     port: 2525
 #    port: 465
 #    ssl: true

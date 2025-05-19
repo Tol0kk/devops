@@ -4,7 +4,7 @@
   lib,
 }:
 pkgs.dockerTools.buildLayeredImage {
-  name = "Doodle-Front";
+  name = "doodle-front";
   tag = "0.1.0";
   enableFakechroot = true;
   fakeRootCommands = ''
@@ -12,11 +12,5 @@ pkgs.dockerTools.buildLayeredImage {
   '';
   config = {
     Cmd = ["/server"];
-  };
-
-  meta = with lib; {
-    description = "Angular front-end for the doodle application (container)";
-    homepage = "https://github.com/selabs-ur1/doodle";
-    platforms = platforms.all;
   };
 }

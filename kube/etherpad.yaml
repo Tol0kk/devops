@@ -1,0 +1,55 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: etherpad
+  namespace: doodle
+  labels:
+    k8s-app: etherpad
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: etherpad
+  template:
+    metadata:
+      name: etherpad
+      labels:
+        k8s-app: etherpad
+    spec:
+      containers:
+        - name: etherpad
+          image: etherpad/etherpad:1.8.6
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: apikey-volume
+              mountPath: /opt/etherpad-lite/APIKEY.txt
+              subPath: APIKEY.txt
+      volumes:
+        - name: apikey-volume
+          secret:
+            secretName: etherpad-apikey
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: etherpad
+  namespace: doodle
+  labels:
+    k8s-app: etherpad
+spec:
+  ports:
+    - name: tcp-9001-9001-etherpad
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
+  selector:
+    k8s-app: etherpad

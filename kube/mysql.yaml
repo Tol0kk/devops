@@ -1,0 +1,56 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mysql
+  namespace: doodle
+  labels:
+    k8s-app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: mysql
+  template:
+    metadata:
+      name: mysql
+      labels:
+        k8s-app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "root"
+            - name: MYSQL_DATABASE
+              value: "tlc"
+            - name: MYSQL_USER
+              value: "tlc"
+            - name: MYSQL_PASSWORD
+              value: "tlc"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          emptyDir: {}  # TODO Use a PersistentVolumeClaim in production
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namespace: doodle
+  labels:
+    k8s-app: mysql
+spec:
+  type: NodePort
+  ports:
+    - name: tcp-3306-3306-mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+      nodePort: 32306
+  selector:
+    k8s-app: mysql
