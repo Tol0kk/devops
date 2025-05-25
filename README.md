@@ -2,7 +2,7 @@
 
 # Infrastructure Declaration using Terraform
 
-We choose to declare all the machine in our infrastructure using terraform Terraform. We use it to declare our infrastructure on OVH Cloud. 
+We choose to declare all the machine in our infrastructure using Terraform. We use it to declare our infrastructure on OVH Cloud. 
 
 ## Terraform
 
@@ -16,7 +16,7 @@ We took OHV Cloud because it is French and that get a 200€ Credit to try diffe
 
 ## Configuration
 
-We followed [this](https://help.ovhcloud.com/csm/fr-public-cloud-compute-terraform?id=kb_article_view&sysparm_article=KB0050792) OVH tutorial to setup the Terraform using OCH Cloud.
+We followed [this](https://help.ovhcloud.com/csm/fr-public-cloud-compute-terraform?id=kb_article_view&sysparm_article=KB0050792) OVH tutorial to setup the Terraform using OVH Cloud.
 
 When using Terraform in general we give access to Terraform to perform actions  (Create a network, VM, Bucket, ...) under our CLoud provider account. Thus we need to given some identification token to the Terraform CLI. 
 
@@ -47,10 +47,13 @@ terraform plan
 terraform apply
 
 # Delete infra (Optional)
-terraform deploy
+terraform destroy
 
 # Print available Openstack Images
 openstack image list --public
+
+# Generate Ansible inventory
+terraform output -json | jq .ansible_inventory.value | sed 's/^"\|"$//g' |  { echo -e "$(cat)"; } > ../ansible/environments/production/hosts 
 ```
 
 # Systems Configuration using Nix
@@ -68,9 +71,9 @@ We choose to go the more declarative way and use Nix/NixOS to do the configurati
 
 ## The Doodle App
 
-The doodle application use multiple services. We have an SQL Server (mysql-like), etherpad and a mail server.
+The doodle application use multiple services. We have an SQL Server, etherpad and a mail server.
 
-Here is the description bt service of the stack.
+Here is the description of doodle app architecture and dependancies.
 - Doodle Frontend (Angular 10/Typescript)
     - Static files served by a httpd server.
     - Port 3000
@@ -80,7 +83,7 @@ Here is the description bt service of the stack.
 - Doodle Back (Quarkus/Java JDK 11)
     - Port 8080
     - Call directly (Can be intern):
-        - Database with `jdbc:mariadb://mysql:3306` endpoint
+        - Database with `jdbc:mysql://mysql:3306` endpoint
         - Mail Server with `http://mail:2525`
 - Database (MariaDB)
     - Port 3306
