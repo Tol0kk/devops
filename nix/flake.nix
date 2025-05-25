@@ -2,10 +2,13 @@
   description = "A Nix-flake-based Java development environment";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+  inputs.disko.url = "github:nix-community/disko";
+  inputs.disko.inputs.nixpkgs.follows = "nixpkgs";
 
   outputs = {
     self,
     nixpkgs,
+    ...
   } @ inputs: let
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
     forEachSupportedSystem = f:
@@ -31,21 +34,26 @@
       inherit doodle-front doodle-front-docker doodle-front-server;
     });
 
-    apps = forEachSupportedSystem ({pkgs}: {
-      # Back
-      doodle-api-server = {
-        type = "app";
-        program = "${self.packages.${pkgs.system}.doodle-api-server}/bin/doodle-api-server";
-      };
-      # Front
-      doodle-front-server = {
-        type = "app";
-        program = "${self.packages.${pkgs.system}.doodle-front-server}/bin/doodle-front-server";
-      };
-      vm-test = libs.mkAppVM "vm-front-x86_64-linux" self;
-    });
+    apps = forEachSupportedSystem ({pkgs}:
+      {
+        # Back
+        doodle-api-server = {
+          type = "app";
+          program = "${self.packages.${pkgs.system}.doodle-api-server}/bin/doodle-api-server";
+        };
+        # Front
+        doodle-front-server = {
+          type = "app";
+          program = "${self.packages.${pkgs.system}.doodle-front-server}/bin/doodle-front-server";
+        };
+      }
+      // libs.mkVMsApp {inherit self;});
 
-    nixosConfigurations = import nix/systems {inherit inputs nixpkgs libs;};
+    nixosConfigurations = import nix/systems {inherit inputs nixpkgs libs self;};
+
+    nixosModules.ovhcloud.imports = [
+      nix/modules/single-disk.nix
+    ];
 
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
@@ -60,9 +68,19 @@
           # Backend
           jdk11
           maven
+          
 
           # Docker
           dive
+          compose2nix
+
+          # Kubectl
+          minikube
+
+          # Terraform
+          tenv
+          # Open Stack
+          openstackclient
         ];
       };
     });

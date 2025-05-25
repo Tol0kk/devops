@@ -1,4 +1,4 @@
 {lib, ...}: {
   mkSystem = import ./mkSystem.nix {inherit lib;};
-  mkAppVM = import ./mkAppVM.nix;
+  mkVMsApp = import ./mkVMsApp.nix {inherit lib;};
 }

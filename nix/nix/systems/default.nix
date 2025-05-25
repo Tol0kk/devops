@@ -3,6 +3,7 @@
   inputs,
   nixpkgs,
   libs,
+  self,
   ...
 }: let
   inherit (nixpkgs) lib;
@@ -21,7 +22,7 @@
   mkSys = name: file: (system: {
     name = "${name}-${system}";
     value = libs.mkSystem {
-      inherit system inputs;
+      inherit system inputs self;
       config = systemsFolder + "/${file}";
     };
   });
