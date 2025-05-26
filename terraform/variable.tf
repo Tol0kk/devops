@@ -63,6 +63,11 @@ variable "private_key_path" {
 variable "nixos-init-system" {
   description = "System to use for nixos-anywhere to deploy"
   type        = string
-  default     = "vm-init-x86_64-linux"
+  default     = "vm-master-x86_64-linux"
 }
 
+variable "ssh_user" {
+  description = "A user to use to connect to remote instance"
+  type        = string
+  default     = "ubuntu"
+}

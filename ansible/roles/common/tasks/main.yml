@@ -1,0 +1,101 @@
+- name: Install Common packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - software-properties-common
+      - python3-pip
+      - python3-setuptools
+    state: present
+    update_cache: yes
+
+- name: Use the k8s apt key
+  get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
+    dest: /etc/apt/keyrings/kubernetes-apt-keyring.asc
+    mode: "0644"
+
+- name: Install k8s apt sources
+  apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
+    state: present
+
+- name: Install Kubernetes packages
+  apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    update_cache: yes
+
+- name: Use the docker apt key
+  get_url:
+    url:  https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker-apt-keyring.asc
+    mode: "0644"
+
+- name: Install docker apt sources
+  apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/docker-apt-keyring.asc]  https://download.docker.com/linux/ubuntu oracular stable
+    state: present
+
+- name: Update apt and install docker-ce
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
+
+- name: add modules required by containerd
+  modprobe:
+    name: "{{ item }}"
+    state: present
+    persistent: present
+  loop:
+    - overlay
+    - br_netfilter
+
+- name: install containerd
+  apt:
+    name: containerd
+
+- name: create containerd directory
+  file:
+    path: /etc/containerd
+    state: directory
+
+- name: create containerd config
+  shell: containerd config default > /etc/containerd/config.toml
+
+- name: Copy front docker images to remote
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../kube/containerd_config.toml"
+    dest: "/home/ubuntu/images/doodle-front-docker"
+    mode: '0644'
+
+- name: enable containerd
+  service:
+    name: containerd
+    enabled: yes
+
+- name: configure kubernetes networking
+  sysctl:
+    sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    - { name: 'net.ipv4.ip_forward', value: '1'}
+    - { name: 'net.bridge.bridge-nf-call-iptables', value: '1'}
+    - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1'}
+
+- name: enable kubelet
+  service:
+    name: kubelet
+    enabled: yes
+
+- name: restart containerd
+  service:
+    name: containerd
+    state: restarted

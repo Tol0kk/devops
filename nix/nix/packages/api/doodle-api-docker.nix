@@ -5,7 +5,8 @@
 }:
 pkgs.dockerTools.buildLayeredImage {
   name = "doodle-api";
-  tag = "0.1.0";
+  tag = "latest";
+  created = "now";
   enableFakechroot = true;
   fakeRootCommands = ''
     ln -s  ${doodle-api-server}/bin/doodle-api-server /server

@@ -1,0 +1,64 @@
+- name: Ensure /home/ubuntu/images directory exists
+  file:
+    path: /home/ubuntu/images
+    state: directory
+    mode: '0744'
+    owner: ubuntu
+
+- name: Generate front docker images
+  delegate_to: localhost
+  register: gen_output
+  become: false   # ensure no sudo
+  ansible.builtin.command: |
+    nix build {{ playbook_dir }}/../nix/.#doodle-front-docker --print-out-paths
+
+- name: Copy front docker images to remote
+  ansible.builtin.copy:
+    src: "{{ gen_output.stdout }}"
+    dest: "/home/ubuntu/images/doodle-front-docker"
+    mode: '0644'
+
+- name: Load front docker images image into containerd with ctr
+  ansible.builtin.command:
+    cmd: |
+      ctr -n k8s.io images import /home/ubuntu/images/doodle-front-docker
+      ctr -n k8s.io images tag docker.io/library/doodle-front:latest doordle.ovh/prod/doodle-front:latest
+
+- name: Generate api docker images
+  delegate_to: localhost
+  register: gen_output
+  become: false   # ensure no sudo
+  ansible.builtin.command: |
+    nix build {{ playbook_dir }}/../nix/.#doodle-api-docker --print-out-paths
+
+- name: Copy api docker images to remote
+  ansible.builtin.copy:
+    src: "{{ gen_output.stdout }}"
+    dest: "/home/ubuntu/images/doodle-api-docker"
+    mode: '0644'
+
+- name: Load api docker images image into containerd with ctr
+  ansible.builtin.command:
+    cmd: |
+      ctr -n k8s.io images import /home/ubuntu/images/doodle-api-docker
+      ctr -n k8s.io images tag docker.io/library/doodle-api:latest doordle.ovh/prod/doodle-api:latest
+
+- name: Copy kubernetes yaml
+  ansible.builtin.copy:
+    src: ../../../../kube/
+    dest: /home/ubuntu/kube
+    owner: ubuntu
+    group: ubuntu
+    mode: '0644'
+
+- name: Set up kubeconfig
+  become_user: ubuntu
+  shell: |
+    kubectl create namespace doodle
+    kubectl apply -f kube/doodle-api.yaml
+    # kubectl create secret generic etherpad-apikey --from-file=APIKEY.txt=kube/APIKEY.txt -n doodle
+    # kubectl apply -f kube/etherpad.yaml
+    # kubectl apply -f kube/mysql.yaml
+    # kubectl apply -f kube/nginx.yaml
+    # kubectl apply -f kube/doodle-frontend.yaml
+

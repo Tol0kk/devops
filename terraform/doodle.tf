@@ -47,9 +47,8 @@ resource "openstack_compute_instance_v2" "master_instance" {
   provider    = openstack.ovh    
   region      = var.region
   name        = "master_instance"         
-  image_name  = "Ubuntu 24.10"   
   # Discovery 2GB | 1vCPU (2GHz)
-  flavor_name = "d2-2"
+  flavor_name = "d2-4"
   key_pair    = openstack_compute_keypair_v2.test_keypair.name
   image_id    = data.openstack_images_image_v2.os_image.id
   network {
@@ -75,9 +74,8 @@ resource "openstack_compute_instance_v2" "worker_instance" {
   region = var.region
   provider    = openstack.ovh    
   name        = "worker_instance"         
-  image_name  = "Ubuntu 24.10"   
   # Discovery 2GB | 1vCPU (2GHz)
-  flavor_name = "d2-2"
+  flavor_name = "d2-4"
   key_pair    = openstack_compute_keypair_v2.test_keypair.name
   image_id    = data.openstack_images_image_v2.os_image.id
   network {

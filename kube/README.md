@@ -8,7 +8,7 @@ This documentation is for deploying the project using minikube (local kubernetes
 
 # Drawback
 
-This does not expose any other services than a nginx gateways to the services. So fro developement this will not be highly useful. SInce you can't access the services from outside the cluster (database, frontend, backend).
+This does not expose any other services than a nginx gateways to the services. So for developement this will not be highly useful. Since you can't access the services from outside the cluster (database, frontend, backend).
 It also force some domain name inside the project configuration like (frontend, backend, mysql, etherpad). So in a developement environment you will need to change the domain or use a proxy like nginx to redirect the traffic to the correct service or dns reddirect.
 
 # Starting using minikube
@@ -65,8 +65,8 @@ minikube kubectl -- apply -f kube/doodle-frontend.yaml
 minikube kubectl -- apply -f kube/doodle-api.yaml
 
 # Add cert-manager & nginx
-minikube kubectl -- apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml # Need to wait for cert-manager to be ready
-minikube kubectl -- apply -f kube/cert-manager.yaml
+# minikube kubectl -- apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml # Need to wait for cert-manager to be ready
+# minikube kubectl -- apply -f kube/cert-manager.yaml
 minikube kubectl -- apply -f kube/nginx.yaml
 ```
 

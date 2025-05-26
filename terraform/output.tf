@@ -27,7 +27,18 @@ ${join("\n", [
 output "ansible_inventory" {
   description = "Print Information about the created instance"
   value = <<EOT
-  [master]
-  ======================
+[master]
+${openstack_compute_instance_v2.master_instance.network[0].fixed_ip_v4} ansible_user=${var.ssh_user} ansible_ssh_private_key_file=${var.private_key_path}
+[workers]
+${join("\n", [
+  for index, i in openstack_compute_instance_v2.worker_instance : 
+  "${i.network[0].fixed_ip_v4} ansible_user=${var.ssh_user} ansible_ssh_private_key_file=${var.private_key_path}"
+])}
+  EOT
+}
+
+output "ansible_vars" {
+  description = "Print Information about the created instance"
+  value = <<EOT
   EOT
 }

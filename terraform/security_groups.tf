@@ -1,5 +1,5 @@
 # Not allowed to create security group with OVH Openstack
-# This would have been use full to allow ssh connection only to an ip. for example the static ipi of th it department of your entreprise. 
+# This would have been useful to allow ssh connection only to an ip. for example the static ipi of th it department of your entreprise. 
 
 # resource "openstack_networking_secgroup_v2" "base" {
 #   name = "${var.project}_sec_base"

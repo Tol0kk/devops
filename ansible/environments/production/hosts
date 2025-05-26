@@ -1,0 +1,6 @@
+[master]
+162.19.100.84 ansible_user=ubuntu ansible_ssh_private_key_file=/home/titouan/.ssh/Olenixen_id_ed25519
+[workers]
+51.75.185.185 ansible_user=ubuntu ansible_ssh_private_key_file=/home/titouan/.ssh/Olenixen_id_ed25519
+51.75.185.127 ansible_user=ubuntu ansible_ssh_private_key_file=/home/titouan/.ssh/Olenixen_id_ed25519
+

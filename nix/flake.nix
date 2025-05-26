@@ -69,7 +69,6 @@
           jdk11
           maven
           
-
           # Docker
           dive
           compose2nix
